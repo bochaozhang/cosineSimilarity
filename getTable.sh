@@ -2,15 +2,12 @@
 # instanceTable.tsv: number of instances in each clone in each feature
 # sampleTable.tsv: number of samples in each clone in each feature
 
-#echo -n "Enter database and press [Enter]:"
-#read db_name
-#echo -n "Enter subject and press [Enter]:"
-#read subject
-#echo -n "Enter feature and press [Enter]:"
-#read feature
-db_name=lp11
-subject=D145
-feature=tissue
+echo -n "Enter database and press [Enter]:"
+read db_name
+echo -n "Enter subject and press [Enter]:"
+read subject
+echo -n "Enter feature and press [Enter]:"
+read feature
 
 subject_id=$(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select id from subjects where identifier='$subject'")
 
@@ -23,7 +20,7 @@ echo -e "\t${unique_features[@]}" | tr ' ' '\t' > sampleTable.tsv
 clones=()
 while read -r output_line; do
     clones+=($output_line)
-done < <(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select id from clones where subject_id=$subject_id and functional=1 and id<873500")
+done < <(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select id from clones where subject_id=$subject_id and functional=1")
 echo "${#clones[@]} clones featched"
 
 declare -A feature_samples
@@ -40,21 +37,15 @@ for clone in ${clones[@]}; do
     for feat in ${unique_features[@]}; do
         sample_group=$(echo "${feature_samples[$feat]}" | tr ' ' ',')
         seq_counts[i]=$(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select count(*) from sequences where clone_id=$clone and functional=1 and sample_id in ($sample_group)")
-        samples=$(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select distinct sample_id from sequences where clone_id=$clone and functional=1 and sample_id in ($sample_group) ")
-        sample_counts[i]=$(wc -w <<<$samples)
-        #echo "$samples"
-        #echo "$samples" | wc -w
-        #echo "-------"
+        sample_counts[i]=$(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select count(distinct sample_id) from sequences where clone_id=$clone and functional=1 and sample_id in ($sample_group) ")
         i+=1
     done
     for n in ${seq_counts[@]}; do
 ###############################
         if (($n>0)); then      # <------change minimum threshold here
 ###############################
-            echo "${seq_counts[@]}"
-            echo "${sample_counts[@]}"
             echo -e "$clone\t${seq_counts[@]}" | tr ' ' '\t' >> instanceTable.tsv
-            echo -e "$clone${sample_counts[@]}" | tr '\s+' '\t' >> sampleTable.tsv
+            echo -e "$clone\t${sample_counts[@]}" | tr ' ' '\t' >> sampleTable.tsv
             break
         fi
     done 
