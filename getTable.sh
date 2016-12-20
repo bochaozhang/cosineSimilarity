@@ -13,6 +13,7 @@ subject_id=$(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu
 
 features=$(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select distinct $feature from samples where subject_id=$subject_id")
 unique_features=$(echo "${features[@]}" | tr '\n' ' ')
+echo "Features: $unique_features"
 
 echo -e "\t${unique_features[@]}" | tr ' ' '\t' > instanceTable.tsv
 echo -e "\t${unique_features[@]}" | tr ' ' '\t' > sampleTable.tsv
