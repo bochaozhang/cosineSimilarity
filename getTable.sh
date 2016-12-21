@@ -15,14 +15,14 @@ features=$(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu -
 unique_features=$(echo "${features[@]}" | tr '\n' ' ')
 echo "Features: $unique_features"
 
-echo -e "\t${unique_features[@]}" | tr ' ' '\t' > instanceTable.tsv
-echo -e "\t${unique_features[@]}" | tr ' ' '\t' > sampleTable.tsv
+echo -e "clone_id\t${unique_features[@]}" | tr ' ' '\t' > instanceTable.tsv
+echo -e "clone_id\t${unique_features[@]}" | tr ' ' '\t' > sampleTable.tsv
 
 clones=()
 while read -r output_line; do
     clones+=($output_line)
 done < <(mysql --defaults-extra-file=security.cnf -h clash.biomed.drexel.edu --database=$db_name -N -B -e "select id from clones where subject_id=$subject_id and functional=1")
-echo "${#clones[@]} clones featched"
+echo "${#clones[@]} clones fetched"
 
 declare -A feature_samples
 for feat in ${unique_features}; do
