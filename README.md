@@ -1,4 +1,4 @@
-Cosine similarity
+Calculate cosine similarity
 =============
 
 Bochao Zhang
