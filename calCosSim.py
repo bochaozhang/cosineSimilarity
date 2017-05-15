@@ -1,5 +1,6 @@
 def calculateExternal():
     header, matrix = readTSV('sampleTable.tsv')
+    del header[0]
     matrix = zip(*matrix)
     output_file = open('externalSimilarity.tsv','w')
     output_file.write('\t' + '\t'.join(header) + '\n')
