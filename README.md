@@ -44,6 +44,9 @@ The code will out put three files, each with prefix:
 [subject]-[feature]-[C*X*]-
 in which *X* denotes the lower bound clone size. The three files are:
 
+## Optional figures
+You can make figures of cosine similarity using drawColSim.m (requires Matlab). 
+help drawColSim for information
 
 **instanceTable.tsv**: each row is a clone, starts with a uniquely assigned clone id, and each column is the number of total instances in each compartment.
 
